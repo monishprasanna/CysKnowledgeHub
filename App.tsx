@@ -3,16 +3,114 @@ import React, { useState } from 'react';
 import Layout from './components/Layout';
 import ChatAssistant from './components/ChatAssistant';
 import { MOCK_CONTENT, MOCK_INTERVIEWS, ROADMAPS } from './constants';
-import { ContentType } from './types';
+import { ContentType, RoadmapData } from './types';
 import ProjectsPage from './components/ProjectsPage';
-import { 
-  Terminal, Shield, BookOpen, Map, Award, Briefcase, 
-  ExternalLink, ArrowRight, User, Calendar, Tag, ChevronRight,
-  Code, HardDrive, Cpu, Search
+import {
+  Terminal, Shield, BookOpen, Map, Award, Briefcase,
+  ExternalLink, ArrowRight, User, ChevronRight,
+  Code, HardDrive, Search, Clock, ArrowLeft
 } from 'lucide-react';
+
+// ─── Roadmap detail page ────────────────────────────────────────────────────
+
+const roleConfig: Record<string, { icon: React.FC<{ className?: string }>, accent: string }> = {
+  SOC_ANALYST: { icon: Shield, accent: 'from-cyan-900/30 to-blue-900/20' },
+  PENETRATION_TESTER: { icon: Terminal, accent: 'from-emerald-900/20 to-cyan-900/20' },
+  GRC_SPECIALIST: { icon: Award, accent: 'from-indigo-900/20 to-cyan-900/20' },
+  CLOUD_SECURITY: { icon: HardDrive, accent: 'from-sky-900/20 to-cyan-900/20' },
+};
+
+interface RoadmapDetailPageProps {
+  roadmap: RoadmapData;
+  onBack: () => void;
+}
+
+const RoadmapDetailPage: React.FC<RoadmapDetailPageProps> = ({ roadmap, onBack }) => {
+  const cfg = roleConfig[roadmap.id] || roleConfig.SOC_ANALYST;
+  const Icon = cfg.icon;
+
+  return (
+    <div className="max-w-3xl mx-auto space-y-10">
+      {/* Back button */}
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 text-gray-400 hover:text-cyan-400 transition-colors text-sm font-medium group"
+      >
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+        Back to Roadmaps
+      </button>
+
+      {/* Header */}
+      <div className={`bg-gradient-to-br ${cfg.accent} border border-cyan-500/20 rounded-3xl p-8`}>
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center flex-shrink-0">
+            <Icon className="w-6 h-6 text-cyan-400" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">{roadmap.title} Path</h1>
+            <p className="text-gray-400 mt-1">{roadmap.subtitle}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-cyan-400/70 font-medium bg-cyan-900/20 border border-cyan-500/10 rounded-full px-3 py-1 w-fit">
+          <Map className="w-3.5 h-3.5" />
+          {roadmap.steps.length} stages · Structured learning path
+        </div>
+      </div>
+
+      {/* Timeline */}
+      <div className="relative space-y-0">
+        {/* Vertical line */}
+        <div className="absolute left-[19px] top-5 bottom-5 w-0.5 bg-gradient-to-b from-cyan-500/60 via-cyan-500/20 to-transparent" />
+
+        {roadmap.steps.map((step, i) => (
+          <div key={i} className="relative pl-14 pb-8 last:pb-0">
+            {/* Step number circle */}
+            <div className="absolute left-0 top-0 w-10 h-10 rounded-full bg-gray-900 border-2 border-cyan-500 flex items-center justify-center font-bold text-cyan-400 text-sm z-10 shadow-lg shadow-cyan-500/10">
+              {i + 1}
+            </div>
+
+            {/* Card */}
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-cyan-500/40 transition-all duration-200 group">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                <h3 className="text-lg font-bold group-hover:text-cyan-400 transition-colors">{step.title}</h3>
+                {step.duration && (
+                  <span className="flex items-center gap-1.5 text-xs text-gray-500 whitespace-nowrap flex-shrink-0">
+                    <Clock className="w-3.5 h-3.5" />
+                    {step.duration}
+                  </span>
+                )}
+              </div>
+              <p className="text-gray-400 text-sm mb-4 leading-relaxed">{step.description}</p>
+              <div className="flex flex-wrap gap-2">
+                {step.resources.map(r => (
+                  <span
+                    key={r}
+                    className="text-[11px] bg-cyan-900/30 text-cyan-300 px-2.5 py-1 rounded-full border border-cyan-500/20 font-medium"
+                  >
+                    {r}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ─── Main App ────────────────────────────────────────────────────────────────
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
+  const [activeRoadmap, setActiveRoadmap] = useState<string | null>(null);
+
+  const roadmapCards = [
+    { id: 'SOC_ANALYST', title: 'SOC Analyst', desc: 'Focus on defensive operations and monitoring.', icon: Shield },
+    { id: 'PENETRATION_TESTER', title: 'Penetration Tester', desc: 'Ethical hacking and offensive security.', icon: Terminal },
+    { id: 'GRC_SPECIALIST', title: 'GRC Specialist', desc: 'Governance, risk, and compliance.', icon: Award },
+    { id: 'CLOUD_SECURITY', title: 'Cloud Security', desc: 'Securing AWS, Azure, and GCP environments.', icon: HardDrive },
+  ];
 
   const renderContent = () => {
     switch (activeTab) {
@@ -21,8 +119,8 @@ const App: React.FC = () => {
           <div className="space-y-16">
             {/* Hero */}
             <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border border-cyan-500/20 p-8 md:p-16 text-center">
-              <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" 
-                   style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #06b6d4 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
+              <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"
+                style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #06b6d4 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
                 Master the Art of <span className="text-cyan-500 underline decoration-cyan-500/30">Cyber Defense</span>
               </h1>
@@ -90,7 +188,7 @@ const App: React.FC = () => {
 
       case 'blogs':
       case 'ctf':
-      case 'experiments':
+      case 'experiments': {
         const typeMap: Record<string, ContentType> = {
           'blogs': ContentType.BLOG,
           'ctf': ContentType.CTF,
@@ -106,9 +204,9 @@ const App: React.FC = () => {
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                <input 
-                  type="text" 
-                  placeholder={`Search ${activeTab}...`} 
+                <input
+                  type="text"
+                  placeholder={`Search ${activeTab}...`}
                   className="bg-gray-900 border border-gray-800 rounded-full py-2 pl-10 pr-4 w-full md:w-64 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                 />
               </div>
@@ -146,11 +244,23 @@ const App: React.FC = () => {
             </div>
           </div>
         );
+      }
 
       case 'projects':
         return <ProjectsPage />;
 
       case 'roadmaps':
+        // Individual roadmap detail view
+        if (activeRoadmap && ROADMAPS[activeRoadmap]) {
+          return (
+            <RoadmapDetailPage
+              roadmap={ROADMAPS[activeRoadmap]}
+              onBack={() => setActiveRoadmap(null)}
+            />
+          );
+        }
+
+        // Roadmap selection grid
         return (
           <div className="max-w-4xl mx-auto space-y-12">
             <div className="text-center">
@@ -159,46 +269,22 @@ const App: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                { title: 'SOC Analyst', desc: 'Focus on defensive operations and monitoring.', icon: Shield },
-                { title: 'Penetration Tester', desc: 'Ethical hacking and offensive security.', icon: Terminal },
-                { title: 'GRC Specialist', desc: 'Governance, risk, and compliance.', icon: Award },
-                { title: 'Cloud Security', desc: 'Securing AWS, Azure, and GCP environments.', icon: HardDrive },
-              ].map((role) => (
-                <div key={role.title} className="bg-gray-900 border border-gray-800 p-6 rounded-2xl hover:border-cyan-500/50 transition-all group cursor-pointer">
-                  <role.icon className="w-10 h-10 text-cyan-500 mb-4" />
-                  <h3 className="text-xl font-bold mb-2 group-hover:text-cyan-400">{role.title}</h3>
-                  <p className="text-gray-400 text-sm mb-6">{role.desc}</p>
-                  <button className="flex items-center gap-2 text-sm font-semibold text-cyan-500">
-                    View Interactive Roadmap <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-cyan-900/10 border border-cyan-500/20 p-8 rounded-3xl">
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <Map className="text-cyan-500" /> SOC Analyst Path
-              </h3>
-              <div className="space-y-8 relative">
-                <div className="absolute left-[19px] top-4 bottom-4 w-0.5 bg-gray-800"></div>
-                {ROADMAPS.SOC_ANALYST.map((step, i) => (
-                  <div key={i} className="relative pl-12">
-                    <div className="absolute left-0 top-1 w-10 h-10 bg-gray-900 border-2 border-cyan-500 rounded-full flex items-center justify-center font-bold z-10">
-                      {i + 1}
-                    </div>
-                    <h4 className="text-lg font-bold mb-1">{step.title}</h4>
-                    <p className="text-gray-400 text-sm mb-3">{step.description}</p>
-                    <div className="flex gap-3">
-                      {step.resources.map(r => (
-                        <span key={r} className="text-[10px] bg-cyan-900/30 text-cyan-300 px-2 py-1 rounded-full border border-cyan-500/10">
-                          {r}
-                        </span>
-                      ))}
-                    </div>
+              {roadmapCards.map((role) => (
+                <button
+                  key={role.id}
+                  onClick={() => setActiveRoadmap(role.id)}
+                  className="bg-gray-900 border border-gray-800 p-6 rounded-2xl hover:border-cyan-500/50 transition-all duration-200 group cursor-pointer text-left w-full focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-4 group-hover:bg-cyan-500/20 transition-colors">
+                    <role.icon className="w-5 h-5 text-cyan-400" />
                   </div>
-                ))}
-              </div>
+                  <h3 className="text-xl font-bold mb-2 group-hover:text-cyan-400 transition-colors">{role.title}</h3>
+                  <p className="text-gray-400 text-sm mb-6">{role.desc}</p>
+                  <span className="flex items-center gap-2 text-sm font-semibold text-cyan-500 group-hover:gap-3 transition-all">
+                    View Interactive Roadmap <ChevronRight className="w-4 h-4" />
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         );
@@ -223,11 +309,10 @@ const App: React.FC = () => {
                         <h4 className="text-lg font-bold">{exp.company}</h4>
                         <p className="text-cyan-500 text-sm">{exp.role}</p>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${
-                        exp.difficulty === 'Hard' ? 'bg-red-900/20 text-red-400 border border-red-500/20' :
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${exp.difficulty === 'Hard' ? 'bg-red-900/20 text-red-400 border border-red-500/20' :
                         exp.difficulty === 'Medium' ? 'bg-yellow-900/20 text-yellow-400 border border-yellow-500/20' :
-                        'bg-green-900/20 text-green-400 border border-green-500/20'
-                      }`}>
+                          'bg-green-900/20 text-green-400 border border-green-500/20'
+                        }`}>
                         {exp.difficulty}
                       </span>
                     </div>
@@ -272,7 +357,7 @@ const App: React.FC = () => {
                     View Full Directory
                   </button>
                 </div>
-                
+
                 <div className="bg-gray-900 border border-gray-800 p-6 rounded-2xl">
                   <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
                     <Award className="text-yellow-500" /> Prep Resources
@@ -300,7 +385,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+    <Layout activeTab={activeTab} setActiveTab={(tab) => { setActiveTab(tab); setActiveRoadmap(null); }}>
       {renderContent()}
       <ChatAssistant />
     </Layout>

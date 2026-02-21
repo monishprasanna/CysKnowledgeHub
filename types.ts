@@ -27,6 +27,14 @@ export interface RoadmapStep {
   title: string;
   description: string;
   resources: string[];
+  duration?: string;
+}
+
+export interface RoadmapData {
+  id: string;
+  title: string;
+  subtitle: string;
+  steps: RoadmapStep[];
 }
 
 export interface InterviewExperience {
