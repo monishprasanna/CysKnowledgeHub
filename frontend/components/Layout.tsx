@@ -27,17 +27,9 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  // Keep a concise top-level nav and expose category subsections to avoid duplicate flat items
   const navItems = [
     { id: 'home', label: 'Home', icon: Shield },
-    { id: 'blogs', label: 'Blogs', icon: BookOpen },
-    { id: 'ctf', label: 'CTF Guides', icon: Terminal },
-    { id: 'roadmaps', label: 'Roadmaps', icon: Map },
-    { id: 'projects', label: 'Projects', icon: Github },
-    { id: 'achievements', label: 'Achievements', icon: Award },
-    { id: 'experiments', label: 'Experiments', icon: Cpu },
-    { id: 'career', label: 'Career', icon: Briefcase },
-    { id: 'companies', label: 'Companies', icon: Building2 },
-  { id: 'certifications', label: 'Certifications', icon: FileBadge },
     {
       id: 'learn', label: 'Learn', icon: BookOpen,
       subItems: [
@@ -61,7 +53,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
         { id: 'career', label: 'Preparation', icon: Briefcase },
         { id: 'interviews', label: 'Experiences', icon: MessageSquare },
         { id: 'companies', label: 'Companies', icon: Building2 },
-        // Student list moved under Career Hub as "The Constellation"
+        // Student list is intentionally kept inside Career Hub as "The Constellation"
         { id: 'students', label: 'The Constellation', icon: Users },
       ]
     }
