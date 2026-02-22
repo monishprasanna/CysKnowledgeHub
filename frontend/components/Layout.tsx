@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Shield, BookOpen, Map, Award, Terminal, Briefcase, Menu, X, Github, UserCircle, LogOut, Cpu, Building2, ChevronDown, FileBadge } from 'lucide-react';
+import { Shield, BookOpen, Map, Award, Terminal, Briefcase, Menu, X, Github, UserCircle, LogOut, Cpu, Building2, ChevronDown, FileBadge, Users } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './AuthModal';
 
@@ -39,6 +39,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
     { id: 'career', label: 'Career', icon: Briefcase },
     { id: 'companies', label: 'Companies', icon: Building2 },
     { id: 'certifications', label: 'Certifications', icon: FileBadge },
+    { id: 'students', label: 'The Constellation', icon: Users },
   ];
 
   return (
@@ -52,7 +53,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
           </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-6">
             {navItems.map((item) => (
               <button
                 key={item.id}
@@ -124,7 +125,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-40 bg-gray-950/95 pt-20">
+        <div className="md:hidden fixed inset-0 z-40 bg-gray-950/95 pt-20 overflow-y-auto pb-10">
           <nav className="flex flex-col items-center gap-8">
             {navItems.map((item) => (
               <button

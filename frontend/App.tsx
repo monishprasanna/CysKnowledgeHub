@@ -8,6 +8,7 @@ import ProjectsPage from './components/ProjectsPage';
 import AchievementsPage from './components/AchievementsPage';
 import CertificationsPage from "./components/CertificationsPage";
 import CompaniesPage from './components/CompaniesPage';
+import StudentsPage from './components/StudentsPage';
 import {
   Terminal, Shield, BookOpen, Map, Award, Briefcase,
   ExternalLink, ArrowRight, User, ChevronRight,
@@ -415,9 +416,12 @@ const App: React.FC = () => {
 
       case 'companies':
         return <CompaniesPage />;
-        
+
       case 'certifications':
         return <CertificationsPage />;
+
+      case 'students':
+        return <StudentsPage />;
 
       case 'roadmaps':
         // Individual roadmap detail view
