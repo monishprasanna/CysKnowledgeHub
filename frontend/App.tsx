@@ -5,6 +5,8 @@ import ChatAssistant from './components/ChatAssistant';
 import { MOCK_CONTENT, MOCK_INTERVIEWS, ROADMAPS } from './constants';
 import { ContentType, RoadmapData } from './types';
 import ProjectsPage from './components/ProjectsPage';
+import AchievementsPage from './components/AchievementsPage';
+import CompaniesPage from './components/CompaniesPage';
 import {
   Terminal, Shield, BookOpen, Map, Award, Briefcase,
   ExternalLink, ArrowRight, User, ChevronRight,
@@ -406,6 +408,12 @@ const App: React.FC = () => {
 
       case 'projects':
         return <ProjectsPage />;
+
+      case 'achievements':
+        return <AchievementsPage />;
+
+      case 'companies':
+        return <CompaniesPage />;
 
       case 'roadmaps':
         // Individual roadmap detail view
