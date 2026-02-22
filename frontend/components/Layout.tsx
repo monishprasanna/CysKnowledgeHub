@@ -79,8 +79,6 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
           {/* Desktop Nav */}
 
           <nav className="hidden lg:flex items-center gap-6">
-          <nav className="hidden md:flex items-center gap-2">
-
             {navItems.map((item) => (
               item.subItems ? (
                 <div key={item.id} className="relative group">
