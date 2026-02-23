@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Shield, BookOpen, Map, Award, Terminal, Briefcase, Menu, X, Github, UserCircle, LogOut, Cpu, Building2, ChevronDown } from 'lucide-react';
+import { Shield, BookOpen, Map, Award, Terminal, Briefcase, Menu, X, Github, UserCircle, LogOut, Cpu, Building2, ChevronDown, PenLine, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './AuthModal';
 
@@ -15,7 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const { user, signOut } = useAuth();
+  const { user, signOut, role } = useAuth();
 
   // Close user-menu on outside click
   useEffect(() => {
@@ -90,6 +90,25 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
                       <p className="text-sm font-semibold text-white truncate">{user.displayName ?? 'User'}</p>
                       <p className="text-xs text-gray-400 truncate">{user.email}</p>
                     </div>
+                    {(role === 'author' || role === 'admin') && (
+                      <button
+                        onClick={() => { setShowUserMenu(false); setActiveTab('author-dashboard'); }}
+                        className="w-full flex items-center gap-2 px-4 py-3 text-sm text-cyan-400 hover:bg-gray-800 transition-colors"
+                      >
+                        <PenLine className="w-4 h-4" />
+                        My Articles
+                      </button>
+                    )}
+                    {role === 'admin' && (
+                      <button
+                        onClick={() => { setShowUserMenu(false); setActiveTab('admin-dashboard'); }}
+                        className="w-full flex items-center gap-2 px-4 py-3 text-sm text-yellow-400 hover:bg-gray-800 transition-colors"
+                      >
+                        <ShieldCheck className="w-4 h-4" />
+                        Admin Dashboard
+                      </button>
+                    )}
+                    <div className="border-t border-gray-800" />
                     <button
                       onClick={async () => { setShowUserMenu(false); await signOut(); }}
                       className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:bg-gray-800 transition-colors"

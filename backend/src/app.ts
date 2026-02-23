@@ -1,11 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config();
 
-import authRoutes   from './routes/auth';
-import healthRoutes from './routes/health';
+import authRoutes    from './routes/auth';
+import healthRoutes  from './routes/health';
+import adminRoutes   from './routes/admin';
+import topicsRoutes  from './routes/topics';
+import articlesRoutes from './routes/articles';
+import uploadRoutes  from './routes/upload';
 
 const app = express();
 
@@ -16,9 +21,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// ─── Static uploads (article images) ─────────────────────────────────────────
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 // ─── Routes ──────────────────────────────────────────────────────────────────
-app.use('/health',   healthRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/health',        healthRoutes);
+app.use('/api/auth',      authRoutes);
+app.use('/api/admin',     adminRoutes);
+app.use('/api/topics',    topicsRoutes);
+app.use('/api/articles',  articlesRoutes);
+app.use('/api/upload',    uploadRoutes);
 
 // ─── 404 Fallback ─────────────────────────────────────────────────────────────
 app.use((_req, res) => {
