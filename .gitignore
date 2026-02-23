@@ -38,7 +38,13 @@ backend/.env
 backend/config/serviceAccountKey.json
 **/serviceAccountKey.json
 **/serviceAccountKey*.json
+**/*firebase-adminsdk*.json
 
 # Build output
 backend/dist/
 
+backend/src/config/firebase.ts
+
+# Uploaded article images (served as static files at runtime)
+backend/uploads/ctf-images/*
+!backend/uploads/ctf-images/.gitkeep

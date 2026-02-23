@@ -10,10 +10,14 @@ import CertificationsPage from "./components/CertificationsPage";
 import CompaniesPage from './components/CompaniesPage';
 import StudentsPage from './components/StudentsPage';
 import InterviewExperiencesPage from './components/InterviewExperiencesPage';
+import CTFWriteupsPage from './components/CTFWriteupsPage';
+import AuthorDashboard from './components/AuthorDashboard';
+import AdminDashboard from './components/AdminDashboard';
+import { useAuth } from './contexts/AuthContext';
 import {
   Terminal, Shield, BookOpen, Map, Award, Briefcase,
   ExternalLink, ArrowRight, User, ChevronRight,
-  Code, HardDrive, Search, Clock, ArrowLeft, Check
+  Code, HardDrive, Search, Clock, ArrowLeft, Check, Lock,
 } from 'lucide-react';
 
 // ─── Roadmap detail page ──────────────────────────────────────────────────────
@@ -267,6 +271,7 @@ const RoadmapDetailPage: React.FC<RoadmapDetailPageProps> = ({ roadmap, onBack }
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [activeRoadmap, setActiveRoadmap] = useState<string | null>(null);
+  const { role, loading: authLoading } = useAuth();
 
   const roadmapCards = [
     { id: 'SOC_ANALYST', title: 'SOC Analyst', desc: 'Focus on defensive operations and monitoring.', icon: Shield },
@@ -349,12 +354,13 @@ const App: React.FC = () => {
           </div>
         );
 
-      case 'blogs':
       case 'ctf':
+        return <CTFWriteupsPage />;
+
+      case 'blogs':
       case 'experiments': {
         const typeMap: Record<string, ContentType> = {
           'blogs': ContentType.BLOG,
-          'ctf': ContentType.CTF,
           'experiments': ContentType.EXPERIMENT
         };
         const filtered = MOCK_CONTENT.filter(c => c.type === typeMap[activeTab]);
@@ -408,6 +414,26 @@ const App: React.FC = () => {
           </div>
         );
       }
+
+      case 'author-dashboard':
+        if (authLoading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" /></div>;
+        if (!role || (role !== 'author' && role !== 'admin')) return (
+          <div className="flex flex-col items-center justify-center py-20 text-gray-500 gap-3">
+            <Lock className="w-10 h-10 opacity-30" />
+            <p>You need Author or Admin access to view this page.</p>
+          </div>
+        );
+        return <AuthorDashboard />;
+
+      case 'admin-dashboard':
+        if (authLoading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" /></div>;
+        if (role !== 'admin') return (
+          <div className="flex flex-col items-center justify-center py-20 text-gray-500 gap-3">
+            <Lock className="w-10 h-10 opacity-30" />
+            <p>Admin access required.</p>
+          </div>
+        );
+        return <AdminDashboard />;
 
       case 'projects':
         return <ProjectsPage />;
