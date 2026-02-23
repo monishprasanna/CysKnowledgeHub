@@ -154,7 +154,10 @@ export const adminDeleteTopic = (id: string) =>
   );
 
 export const adminGetArticles = (params?: { status?: string; topicId?: string }) => {
-  const qs = new URLSearchParams(params as any).toString();
+  const filtered = Object.fromEntries(
+    Object.entries(params ?? {}).filter(([, v]) => v !== undefined && v !== '')
+  );
+  const qs = new URLSearchParams(filtered).toString();
   return authFetch(`${BASE}/api/admin/articles${qs ? `?${qs}` : ''}`).then((r) =>
     json<{ articles: Article[] }>(r)
   );
