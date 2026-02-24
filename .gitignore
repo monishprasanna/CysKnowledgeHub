@@ -49,3 +49,4 @@ backend/src/config/firebase.ts
 backend/uploads/ctf-images/*
 !backend/uploads/ctf-images/.gitkeep
 backend/.env
+.vite/
