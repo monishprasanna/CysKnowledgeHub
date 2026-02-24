@@ -9,6 +9,7 @@ import AchievementsPage from './components/AchievementsPage';
 import CertificationsPage from "./components/CertificationsPage";
 import CompaniesPage from './components/CompaniesPage';
 import StudentsPage from './components/StudentsPage';
+import FacultyPage from './components/FacultyPage';
 import InterviewExperiencesPage from './components/InterviewExperiencesPage';
 import DepartmentGallery from './components/galleries/DepartmentGallery';
 import CTFWriteupsPage from './components/CTFWriteupsPage';
@@ -449,6 +450,10 @@ const App: React.FC = () => {
         return <CertificationsPage />;
       case 'students':
         return <StudentsPage />;
+
+      case 'faculty':
+        return <FacultyPage />;
+
       case 'gallery-department':
         return <DepartmentGallery />;
       case 'gallery-events':
