@@ -22,7 +22,7 @@ import fs from 'fs';
 // ─── Bootstrap Firebase Admin ──────────────────────────────────────────────
 
 const serviceAccountPath = path.resolve(
-  process.env.FIREBASE_SERVICE_ACCOUNT_PATH ?? './config/serviceAccountKey.json'
+  process.env.FIREBASE_SERVICE_ACCOUNT_PATH ?? '../config/serviceAccountKey.json'
 );
 
 if (!fs.existsSync(serviceAccountPath)) {
