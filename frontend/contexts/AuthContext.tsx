@@ -14,34 +14,60 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:5000';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+export type UserRole = 'student' | 'author' | 'admin';
+
+export interface DbUser {
+  uid: string;
+  email: string;
+  displayName?: string;
+  photoURL?: string;
+  role: UserRole;
+}
+
 export interface AuthContextValue {
   user: User | null;
+  dbUser: DbUser | null;
+  role: UserRole | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string, displayName: string) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshDbUser: () => Promise<void>;
 }
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// ─── Backend sync ─────────────────────────────────────────────────────────────
+// ─── Backend helpers ──────────────────────────────────────────────────────────
 
-async function syncUserWithBackend(user: User): Promise<void> {
+async function syncUserWithBackend(user: User): Promise<DbUser | null> {
   try {
     const idToken = await user.getIdToken();
-    await fetch(`${BACKEND_URL}/api/auth/login`, {
+    const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${idToken}`,
-      },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
     });
+    const data = await res.json();
+    return data.user ?? null;
   } catch (err) {
-    // Non-fatal: backend might be offline during development
     console.warn('[Auth] Could not sync user with backend:', err);
+    return null;
+  }
+}
+
+async function fetchDbUser(user: User): Promise<DbUser | null> {
+  try {
+    const idToken = await user.getIdToken();
+    const res = await fetch(`${BACKEND_URL}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${idToken}` },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.user ?? null;
+  } catch {
+    return null;
   }
 }
 
@@ -49,11 +75,24 @@ async function syncUserWithBackend(user: User): Promise<void> {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [dbUser, setDbUser] = useState<DbUser | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const refreshDbUser = useCallback(async () => {
+    if (!user) return;
+    const du = await fetchDbUser(user);
+    setDbUser(du);
+  }, [user]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
+      if (firebaseUser) {
+        const du = await fetchDbUser(firebaseUser);
+        setDbUser(du);
+      } else {
+        setDbUser(null);
+      }
       setLoading(false);
     });
     return unsubscribe;
@@ -61,26 +100,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = useCallback(async () => {
     const result = await signInWithPopup(auth, googleProvider);
-    await syncUserWithBackend(result.user);
+    const du = await syncUserWithBackend(result.user);
+    setDbUser(du);
   }, []);
 
   const signInWithEmail = useCallback(async (email: string, password: string) => {
     const result = await signInWithEmailAndPassword(auth, email, password);
-    await syncUserWithBackend(result.user);
+    const du = await syncUserWithBackend(result.user);
+    setDbUser(du);
   }, []);
 
   const signUpWithEmail = useCallback(async (email: string, password: string, displayName: string) => {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(result.user, { displayName });
-    await syncUserWithBackend(result.user);
+    const du = await syncUserWithBackend(result.user);
+    setDbUser(du);
   }, []);
 
   const signOut = useCallback(async () => {
     await firebaseSignOut(auth);
+    setDbUser(null);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut }}>
+    <AuthContext.Provider value={{
+      user, dbUser, role: dbUser?.role ?? null, loading,
+      signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, refreshDbUser,
+    }}>
       {children}
     </AuthContext.Provider>
   );
