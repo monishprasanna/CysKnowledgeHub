@@ -121,6 +121,12 @@ export interface Achievement {
   date: string;
   description: string;
   images: string[];
+  // Optional fields used by richer achievement cards
+  imageUrl?: string;
+  rank?: string;
+  category?: string;
+  eventName?: string;
+  link?: string;
 }
 
 export interface CompanyInfo {

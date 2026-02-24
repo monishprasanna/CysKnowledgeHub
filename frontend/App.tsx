@@ -10,6 +10,7 @@ import CertificationsPage from "./components/CertificationsPage";
 import CompaniesPage from './components/CompaniesPage';
 import StudentsPage from './components/StudentsPage';
 import InterviewExperiencesPage from './components/InterviewExperiencesPage';
+import DepartmentGallery from './components/galleries/DepartmentGallery';
 import CTFWriteupsPage from './components/CTFWriteupsPage';
 import AuthorDashboard from './components/AuthorDashboard';
 import AdminDashboard from './components/AdminDashboard';
@@ -448,6 +449,12 @@ const App: React.FC = () => {
         return <CertificationsPage />;
       case 'students':
         return <StudentsPage />;
+      case 'gallery-department':
+        return <DepartmentGallery />;
+      case 'gallery-events':
+        return (
+          <div className="py-20 text-center text-gray-400">Events gallery coming soon.</div>
+        );
       case 'interviews':
         return <InterviewExperiencesPage />;
 

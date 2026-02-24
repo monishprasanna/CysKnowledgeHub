@@ -52,9 +52,15 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
       subItems: [
         // The Constellation (Students list)
         { id: 'students', label: 'The Constellation', icon: Users },
-        // Placeholder entries for future pages (faculty, gallery)
+        // Placeholder entries for future pages (faculty)
         { id: 'faculty', label: 'Faculty', icon: UserCircle },
-        { id: 'gallery', label: 'Gallery', icon: Map },
+      ]
+    },
+    {
+      id: 'gallery_main', label: 'Gallery', icon: Map,
+      subItems: [
+        { id: 'gallery-department', label: 'Department Gallery', icon: Map },
+        { id: 'gallery-events', label: 'Events Gallery', icon: Map },
       ]
     },
     {
